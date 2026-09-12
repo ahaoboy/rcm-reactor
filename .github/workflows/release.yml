@@ -41,8 +41,8 @@ jobs:
       - name: Assemble Windows package
         run: |
           cp target/release/rcm-reactor.exe dist/rcm-reactor.exe
-          zip -j rcm-reactor-windows-x86_64.zip \
-            dist/rcm-reactor.exe dist/rcm_com.dll
+          cd dist
+          7z a -tzip ../rcm-reactor-windows-x86_64.zip rcm-reactor.exe rcm_com.dll
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
