@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -CeEuo pipefail {0}
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Download rcm_com.dll
+        run: |
+          mkdir -p dist
+          curl -fL -o dist/rcm_com.dll \
+            https://github.com/ahaoboy/rcm-com/releases/latest/download/rcm_com.dll
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Assemble Windows package
+        run: |
+          cp target/release/rcm-reactor.exe dist/rcm-reactor.exe
+          zip -j rcm-reactor-windows-x86_64.zip \
+            dist/rcm-reactor.exe dist/rcm_com.dll
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcm-reactor-windows-x86_64
+          path: rcm-reactor-windows-x86_64.zip
+
+      - name: Create GitHub Release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: Nightly
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: rcm-reactor-windows-x86_64.zip

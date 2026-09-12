@@ -1,0 +1,42 @@
+[package]
+name = "rcm-reactor"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "rcm-reactor — RCM reimplementation built with windows-reactor + tray-icon"
+authors = ["ahaoboy"]
+
+[[bin]]
+name = "rcm-reactor"
+path = "src/main.rs"
+
+[dependencies]
+# ── RCM shared crates (same functionality as the Tauri backend) ────────
+rcm-core = { git = "https://github.com/ahaoboy/rcm-tauri.git", branch = "reactor" }
+rcm-vm = { git = "https://github.com/ahaoboy/rcm-tauri.git", branch = "reactor" }
+rcm-com = { git = "https://github.com/ahaoboy/rcm-com.git" }
+rcm-reg = { git = "https://github.com/ahaoboy/rcm-reg.git" }
+
+windows-reactor = { git = "https://github.com/microsoft/windows-rs", version = "0.100" }
+tray-icon = "0.25.0"
+# pin 0.61
+windows = { version = "0.61", features = [
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_UI_Controls",
+  "Win32_UI_Shell_Common",
+  "Win32_Graphics_Gdi",
+  "Win32_Foundation",
+  "Win32_UI_Shell",
+  "Win32_System_Com",
+  "Win32_System_Ole",
+  "Win32_System_Variant",
+  "Win32_System_Threading",
+  "Win32_System_Memory",
+  "Win32_System_LibraryLoader",
+  "Management_Deployment",
+  "ApplicationModel",
+  "Graphics",
+  "Win32_System_SystemInformation",
+] }
+
+tokio = { version = "1", features = ["full"] }
