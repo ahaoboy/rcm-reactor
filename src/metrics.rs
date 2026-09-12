@@ -6,9 +6,8 @@
 //! opinion on how a row *looks*, and no idea how tall one is.
 //!
 //! That knowledge lives here. Reactor renders rows itself at fixed heights, so
-//! these are the real dimensions rather than estimates: a WinUI row is a flat
-//! 28px, not a CSS box the webview has to measure. Two things follow from that,
-//! and they are why this module is more than a table of numbers:
+//! these are the real dimensions rather than estimates. Two things follow from
+//! that, and they are why this module is more than a table of numbers:
 //!
 //! - [`level_height`] predicts a level's height before it is rendered, which is
 //!   what gives a popup a sensible size on its very first frame;

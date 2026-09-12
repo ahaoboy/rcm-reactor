@@ -76,12 +76,6 @@ impl RcmApp {
                 AppEvent::ThemeChanged(theme) => {
                     log::info("Rust::app", &format!("theme changed: {theme}"));
                 }
-                AppEvent::StyleChanged(_css) => {
-                    // Reactor renders native WinUI controls, so the stylesheet
-                    // has no effect on the UI. The config editor still reads it
-                    // from disk, which is all that is needed.
-                    log::info("Rust::app", "style.css refreshed (not applied)");
-                }
             }
         }
     }

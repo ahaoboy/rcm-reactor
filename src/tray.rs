@@ -154,7 +154,6 @@ fn build_menu() -> Result<(Menu, TrayState), Box<dyn std::error::Error>> {
     );
 
     let pull_js = MenuItem::with_id(ids::PULL_JS, text::PULL_JS, true, None);
-    let pull_css = MenuItem::with_id(ids::PULL_CSS, text::PULL_CSS, true, None);
     let pull_config = MenuItem::with_id(ids::PULL_CONFIG, text::PULL_CONFIG, true, None);
     let config_item = MenuItem::with_id(ids::CONFIG, text::CONFIG, true, None);
     let reset = MenuItem::with_id(ids::RESET, text::RESET, true, None);
@@ -169,7 +168,7 @@ fn build_menu() -> Result<(Menu, TrayState), Box<dyn std::error::Error>> {
         true,
         &[&theme_system, &theme_light, &theme_dark],
     )?;
-    let pull_menu = Submenu::with_items(text::PULL, true, &[&pull_js, &pull_css, &pull_config])?;
+    let pull_menu = Submenu::with_items(text::PULL, true, &[&pull_js, &pull_config])?;
 
     // Top-level items. References are collected first so the conditional
     // entries can be appended.
@@ -300,10 +299,9 @@ fn handle_menu_event(state: &TrayState, id: &str) {
             }
         }
 
-        ids::PULL_JS | ids::PULL_CSS | ids::PULL_CONFIG => {
+        ids::PULL_JS | ids::PULL_CONFIG => {
             let suffix = match id {
                 ids::PULL_JS => "js",
-                ids::PULL_CSS => "css",
                 _ => "config",
             };
             handle_pull(suffix);
@@ -317,7 +315,7 @@ fn handle_menu_event(state: &TrayState, id: &str) {
     }
 }
 
-/// Download a remote file and, for CSS, tell the UI to restyle.
+/// Download a remote configuration file.
 fn handle_pull(suffix: &str) {
     let Some(file) = actions::PullFile::parse(suffix) else {
         log::error("Tray", &format!("unknown pull target: {suffix}"));
@@ -325,12 +323,7 @@ fn handle_pull(suffix: &str) {
     };
 
     match actions::pull(file) {
-        Ok(outcome) => {
-            // Only CSS affects anything currently on screen.
-            if let Some(css) = outcome.style_css() {
-                push_event(AppEvent::StyleChanged(css));
-            }
-        }
+        Ok(_) => {}
         Err(e) => report_failure(format!("Pull {} Failed", file.file_name()), e),
     }
 }

@@ -50,10 +50,6 @@ pub enum AppEvent {
     DevChanged(bool),
     /// Theme changed (tray toggle).
     ThemeChanged(String),
-    /// The stylesheet was refreshed from the remote URL (tray "Pull CSS").
-    ///
-    /// Reactor's native UI does not consume CSS, so this is informational.
-    StyleChanged(String),
 }
 
 fn queue() -> &'static Mutex<VecDeque<AppEvent>> {
