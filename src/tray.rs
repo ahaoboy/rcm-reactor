@@ -24,10 +24,7 @@ use crate::events::AppEvent;
 use crate::events::push as push_event;
 
 /// Tray icon embedded from the Tauri project's `public/icon-tray.ico`.
-const TRAY_ICON: &[u8] = include_bytes!(concat!(
-    env!("CARGO_MANIFEST_DIR"),
-    "/../public/icon-tray.ico"
-));
+const TRAY_ICON: &[u8] = include_bytes!("../public/icon-tray.ico");
 
 /// File name the tray writes when extracting the embedded icon.
 const TRAY_ICON_FILE: &str = "icon-tray.ico";
