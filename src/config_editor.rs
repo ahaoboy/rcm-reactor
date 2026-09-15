@@ -11,11 +11,6 @@ use crate::visuals;
 
 const EDITABLE_FILES: &[&str] = &["rcm.js", "rcm.config.json"];
 
-fn file_text(text: &str) -> String {
-    let text = text.replace("\r\n", "\n").replace('\r', "\n");
-    text.trim_end_matches('\n').to_string()
-}
-
 #[derive(Default)]
 struct Buffer {
     content: String,
@@ -48,7 +43,7 @@ impl ConfigEditor {
     fn is_modified(&self, name: &str) -> bool {
         self.buffers
             .get(name)
-            .is_some_and(|buffer| file_text(&buffer.content) != file_text(&buffer.baseline))
+            .is_some_and(|buffer| buffer.content != buffer.baseline)
     }
 
     fn ensure_loaded(&mut self, name: &str) {
@@ -60,8 +55,8 @@ impl ConfigEditor {
             self.buffers.insert(
                 name.to_string(),
                 Buffer {
-                    baseline: file_text(&text),
-                    content: file_text(&text),
+                    baseline: text.clone(),
+                    content: text,
                 },
             );
             self.status = format!("Loaded {name}");
@@ -75,8 +70,8 @@ impl ConfigEditor {
                 self.buffers.insert(
                     name.to_string(),
                     Buffer {
-                        baseline: file_text(&text),
-                        content: file_text(&text),
+                        baseline: text.clone(),
+                        content: text,
                     },
                 );
                 self.status = format!("Loaded {name}");
@@ -90,10 +85,9 @@ impl ConfigEditor {
         let Some(buffer) = self.buffers.get_mut(&name) else {
             return;
         };
-        let content = file_text(&buffer.content);
-        match rcm_core::files::save_config_file(&name, &content) {
+        match rcm_core::files::save_config_file(&name, &buffer.content) {
             Ok(()) => {
-                buffer.baseline = content;
+                buffer.baseline = buffer.content.clone();
                 log::info("ConfigEditor", &format!("saved {name}"));
                 self.status = format!("Saved {name}");
             }
@@ -102,8 +96,7 @@ impl ConfigEditor {
     }
 
     fn copy(&mut self) {
-        let content = file_text(self.content());
-        let result = rcm_core::clipboard::write_text(&content);
+        let result = rcm_core::clipboard::write_text(self.content());
         self.status = match result {
             Ok(()) => format!("Copied {} to clipboard", self.file),
             Err(e) => e,
